@@ -1,0 +1,290 @@
+{
+  "meta": {
+    "name": "Daily Reflection Tree",
+    "version": "1.1.0",
+    "description": "Expanded end-of-day reflection flow. Tracks agency, reciprocity, and awareness. Built to be deterministic but feel conversational.",
+    "dev_notes": "V1.1 update: Added the opening battery check to build rapport before Axis 1. Expanded Axis 3 with secondary branching so it matches the depth of Axes 1 and 2. Total node count is now 28 to give the flow more breathing room.",
+    "axes": {
+      "locus": {
+        "name": "Agency",
+        "description": "Did things happen to them, or did they drive the day?",
+        "poles": ["internal", "external"],
+        "theory_base": "Rotter (1954), Dweck's Mindset stuff"
+      },
+      "orientation": {
+        "name": "Reciprocity",
+        "description": "Giving vs. keeping score.",
+        "poles": ["contribution", "entitlement"],
+        "theory_base": "Organ OCB, Campbell (2004)"
+      },
+      "radius": {
+        "name": "Awareness",
+        "description": "Self-focused vs. team-focused.",
+        "poles": ["altrocentric", "self"],
+        "theory_base": "Batson (2011)"
+      }
+    },
+    "summary_insights": {
+      "internal_contribution_altrocentric": "You tackled today by focusing on what you could control, helping out where you could, and keeping an eye on your team.",
+      "internal_contribution_self": "You took ownership today and put in good effort. Going forward, it might be worth checking in on how your teammates are holding up, too.",
+      "internal_entitlement_altrocentric": "You were highly aware of your own efforts and the people around you today. Just be careful that you aren't spending too much energy waiting for recognition.",
+      "internal_entitlement_self": "You really focused on your own work today and wanted to make sure it was seen. Tomorrow, try looking at the day from someone else's perspective for a few minutes.",
+      "external_contribution_altrocentric": "Even though today felt chaotic or out of your hands, you still showed up for others. That probably made a big difference for someone.",    
+      "external_contribution_self": "Today was a tough draw, but you kept pushing. When things get like this, try to find just one small thing you can control to get your footing back.",
+      "external_entitlement_altrocentric": "You were frustrated by how today unfolded, but you still noticed that others were in the trenches with you. Hang onto that awareness.",
+      "external_entitlement_self": "Today felt heavy, frustrating, and largely out of your hands. Get some rest. Tomorrow, look for one tiny win you can completely control."
+    }
+  },
+  "nodes": [
+    {
+      "id": "intro",
+      "type": "start",
+      "text": "Hey there. Good evening.\n\nBefore you log off, take a couple of minutes to look back at the day.\n\nThis isn't a performance review and nobody is keeping score. It's just a chance to clear your head.",
+      "next": "q_energy_check"
+    },
+    {
+      "id": "q_energy_check",
+      "type": "question",
+      "axis": "none",
+      "text": "Before we Start, how is your battery level looking right now?",
+      "options": [
+        { "label": "I still have some energy left", "next": "q_day_rating" },
+        { "label": "I'm feeling pretty drained", "next": "q_day_rating" },
+        { "label": "I'm completely drained", "next": "q_day_rating" }
+      ]
+    },
+    {
+      "id": "q_day_rating",
+      "type": "question",
+      "axis": "locus",
+      "text": "Got it. If you had to summarize today as a whole, which of these feels the most accurate?",
+      "options": [
+        { "label": "I knocked out mostly everything I planned to do", "next": "route_locus" },
+        { "label": "It was a mixed bag, but mostly fine", "next": "route_locus" },
+        { "label": "I felt like I was just putting out fires all day", "next": "route_locus" }
+      ]
+    },
+    {
+      "id": "route_locus",
+      "type": "decision",
+      "comment": "Split based on whether it was a productive/neutral day or a reactive day",
+      "routes": [
+        { "condition": "q_day_rating.answer in ['I knocked out mostly everything I planned to do', 'It was a mixed bag, but mostly fine']", "next": "q_locus_good" },
+        { "condition": "q_day_rating.answer == 'I felt like I was just putting out fires all day'", "next": "q_locus_bad" }
+      ]
+    },
+    {
+      "id": "q_locus_good",
+      "type": "question",
+      "axis": "locus",
+      "text": "When things were clicking today, why do you think that was?",
+      "options": [
+        { "label": "I set myself up for success earlier in the week", "signal": "locus:internal", "next": "route_locus_reflect" },
+        { "label": "I caught a problem early and pivoted", "signal": "locus:internal", "next": "route_locus_reflect" },
+        { "label": "Honestly, the timing just worked out in my favor", "signal": "locus:external", "next": "route_locus_reflect" },
+        { "label": "Someone stepped in and made my life easier", "signal": "locus:external", "next": "route_locus_reflect" }
+      ]
+    },
+    {
+      "id": "q_locus_bad",
+      "type": "question",
+      "axis": "locus",
+      "text": "When things got derailed, what was your default reaction?",
+      "options": [
+        { "label": "I just looked for the next thing I could actually fix", "signal": "locus:internal", "next": "route_locus_reflect" },
+        { "label": "I kind of just waited for the dust to settle", "signal": "locus:external", "next": "route_locus_reflect" },
+        { "label": "I kept thinking about how this could have been avoided by others", "signal": "locus:external", "next": "route_locus_reflect" }
+      ]
+    },
+    {
+      "id": "route_locus_reflect",
+      "type": "decision",
+      "routes": [
+        { "condition": "state.locus.internal >= state.locus.external", "next": "ref_locus_int" },
+        { "condition": "state.locus.external > state.locus.internal",  "next": "ref_locus_ext" }
+      ]
+    },
+    {
+      "id": "ref_locus_int",
+      "type": "reflection",
+      "axis": "locus",
+      "signal": "locus:internal",
+      "text": "It sounds like you kept pulling your focus back to what you could control.\n\nYou couldn't control everything that happened today, but you kept coming back to the parts that were still up to you.",
+      "next": "bridge_to_team"
+    },
+    {
+      "id": "ref_locus_ext",
+      "type": "reflection",
+      "axis": "locus",
+      "signal": "locus:external",
+      "text": "It sounds like today was heavily shaped by outside factors—other people, bad timing, or just bad luck.\n\nDays like that are draining. Just remember that even in the chaos, how you choose to respond is still entirely yours.",
+      "next": "bridge_to_team"
+    },
+    {
+      "id": "bridge_to_team",
+      "type": "bridge",
+      "text": "Alright, let's shift gears and look at the people you worked with today.",
+      "next": "q_collab_base"
+    },
+    {
+      "id": "q_collab_base",
+      "type": "question",
+      "axis": "orientation",
+      "text": "Think of a specific interaction you had with a teammate today. What was the vibe?",
+      "options": [
+        { "label": "I jumped in to help them out with something", "next": "route_collab" },
+        { "label": "I felt like I was pulling more than my weight", "next": "route_collab" },
+        { "label": "I did some unseen background work to make things run smoother", "next": "route_collab" }
+      ]
+    },
+    {
+      "id": "route_collab",
+      "type": "decision",
+      "comment": "Routing based on whether the vibe was collaborative or imbalanced",
+      "routes": [
+        { "condition": "q_collab_base.answer in ['I jumped in to help them out with something', 'I did some unseen background work to make things run smoother']", "next": "q_contrib_deep" },
+        { "condition": "q_collab_base.answer == 'I felt like I was pulling more than my weight'", "next": "q_entitle_deep" }
+      ]
+    },
+    {
+      "id": "q_contrib_deep",
+      "type": "question",
+      "axis": "orientation",
+      "text": "When you stepped up to help, what was driving that?",
+      "options": [
+        { "label": "It just needed to get done", "signal": "orientation:contribution", "next": "route_orient_reflect" },
+        { "label": "I know they'd do the same for me", "signal": "orientation:contribution", "next": "route_orient_reflect" },
+        { "label": "I was hoping management would notice the extra effort", "signal": "orientation:entitlement", "next": "route_orient_reflect" },
+        { "label": "I like being the person people rely on", "signal": "orientation:entitlement", "next": "route_orient_reflect" }
+      ]
+    },
+    {
+      "id": "q_entitle_deep",
+      "type": "question",
+      "axis": "orientation",
+      "text": "When it felt like things were unequal, how did you handle it?",
+      "options": [
+        { "label": "I vented a little bit in my head but kept pushing", "signal": "orientation:contribution", "next": "route_orient_reflect" },
+        { "label": "I pulled back my effort—why burn myself out?", "signal": "orientation:entitlement", "next": "route_orient_reflect" },
+        { "label": "I made sure someone knew how much I was handling", "signal": "orientation:entitlement", "next": "route_orient_reflect" }
+      ]
+    },
+    {
+      "id": "route_orient_reflect",
+      "type": "decision",
+      "routes": [
+        { "condition": "state.orientation.contribution >= state.orientation.entitlement", "next": "ref_orient_giver" },
+        { "condition": "state.orientation.entitlement > state.orientation.contribution",  "next": "ref_orient_taker" }
+      ]
+    },
+    {
+      "id": "ref_orient_giver",
+      "type": "reflection",
+      "axis": "orientation",
+      "signal": "orientation:contribution",
+      "text": "You were operating with a 'giver' mindset today.\n\nPeople usually notice when someone helps without expecting anything back straight away. Over time, that tends to build trust.",
+      "next": "bridge_to_radius"
+    },
+    {
+      "id": "ref_orient_taker",
+      "type": "reflection",
+      "axis": "orientation",
+      "signal": "orientation:entitlement",
+      "text": "It sounds like you were keeping a close eye on whether your effort was being matched or recognized today.\n\nIt's normal to want your effort to be noticed. At the same time, focusing too much on whether things are perfectly fair can make the day feel even heavier.",
+      "next": "bridge_to_radius"
+    },
+    {
+      "id": "bridge_to_radius",
+      "type": "bridge",
+      "text": "We are almost done. Let's look at the bigger picture.",
+      "next": "q_radius_base"
+    },
+    {
+      "id": "q_radius_base",
+      "type": "question",
+      "axis": "radius",
+      "text": "When things got tense or busy today, where did your attention go?",
+      "options": [
+        { "label": "Survival mode—just getting my own tasks done", "next": "route_radius" },
+        { "label": "Checking the temperature of the team to see how everyone was holding up", "next": "route_radius" },
+        { "label": "Thinking about the end user/client who needs this", "next": "route_radius" },
+        { "label": "Worrying about how my own stress was coming across to others", "next": "route_radius" },
+        { "label": "Honestly, I was too buried in my own screen to notice anyone else", "next": "route_radius" }
+      ]
+    },
+    {
+      "id": "route_radius",
+      "type": "decision",
+      "comment": "Routes to deep dives based on if they were looking inward or outward",
+      "routes": [
+        { "condition": "q_radius_base.answer in ['Checking the temperature of the team to see how everyone was holding up', 'Thinking about the end user/client who needs this', 'Worrying about how my own stress was coming across to others']", "next": "q_radius_deep_team" },
+        { "condition": "q_radius_base.answer in ['Survival mode—just getting my own tasks done', 'Honestly, I was too buried in my own screen to notice anyone else']", "next": "q_radius_deep_self" }
+      ]
+    },
+    {
+      "id": "q_radius_deep_team",
+      "type": "question",
+      "axis": "radius",
+      "text": "When your focus was on the people around you, what was your primary concern?",
+      "options": [
+        { "label": "I wanted to make sure we actually hit our collective goals", "signal": "radius:altrocentric", "next": "route_radius_reflect" },
+        { "label": "I could tell someone was struggling and wanted to ease their load", "signal": "radius:altrocentric", "next": "route_radius_reflect" },
+        { "label": "I didn't want someone else's stress to become my problem", "signal": "radius:self", "next": "route_radius_reflect" },
+        { "label": "I was worried about how my performance looked to them", "signal": "radius:self", "next": "route_radius_reflect" }
+      ]
+    },
+    {
+      "id": "q_radius_deep_self",
+      "type": "question",
+      "axis": "radius",
+      "text": "When you were dialed strictly into your own work, what kept you locked in?",
+      "options": [
+        { "label": "I just had a massive mountain of tasks to get through", "signal": "radius:self", "next": "route_radius_reflect" },
+        { "label": "I was stressed and trying to protect my own peace", "signal": "radius:self", "next": "route_radius_reflect" },
+        { "label": "I was actually in a really good flow state", "signal": "radius:self", "next": "route_radius_reflect" },
+        { "label": "I wanted to finish my part fast so I didn't block the team", "signal": "radius:altrocentric", "next": "route_radius_reflect" }
+      ]
+    },
+    {
+      "id": "route_radius_reflect",
+      "type": "decision",
+      "routes": [
+        { "condition": "state.radius.altrocentric >= state.radius.self", "next": "ref_radius_wide" },
+        { "condition": "state.radius.self > state.radius.altrocentric",  "next": "ref_radius_narrow" }
+      ]
+    },
+    {
+      "id": "ref_radius_wide",
+      "type": "reflection",
+      "axis": "radius",
+      "signal": "radius:altrocentric",
+      "text": "You managed to keep your head up and stay aware of the people around you today.\n\nThat kind of awareness often makes it easier for a team to work well together.",
+      "next": "bridge_to_close"
+    },
+    {
+      "id": "ref_radius_narrow",
+      "type": "reflection",
+      "axis": "radius",
+      "signal": "radius:self",
+      "text": "Your focus was zoomed in on your own experience today.\n\nThat happens to everyone, especially when the workload is heavy. When you log on tomorrow, try to take a quick pulse check of the people around you.",
+      "next": "bridge_to_close"
+    },
+    {
+      "id": "bridge_to_close",
+      "type": "bridge",
+      "text": "Thanks for thinking through that. Let's take a look at the big picture before you close your laptop.",
+      "next": "final_summary"
+    },
+    {
+      "id": "final_summary",
+      "type": "summary",
+      "text": "That's it. Here is the short version of your day:\n\n• Agency: Leaning {locus.dominant}\n• Reciprocity: Leaning {orientation.dominant}\n• Awareness: Leaning {radius.dominant}\n\n{summary_insight}\n\nYou spent a few minutes thinking honestly about the day. Most people do not make time for that.\n\nHave a good evening.",
+      "next": "finish"
+    },
+    {
+      "id": "finish",
+      "type": "end",
+      "text": "Done."
+    }
+  ]
+}
