@@ -1,10 +1,13 @@
 # The Daily Reflection Tree
+![Flow Chart](tree/tree-diagram.png)
 
 **DeepThought Fellowship Assignment**
 
 A deterministic, tree-based reflection tool designed to help employees process their workday across three psychological axes: **Agency** (Locus of Control), **Reciprocity** (Orientation), and **Awareness** (Radius of Concern). 
 
 In accordance with the project constraints, **no LLMs are used at runtime**. The intelligence is encoded entirely into the JSON data structure and routed deterministically via Python.
+
+# The Flow of Reflection Tree
 
 ---
 
