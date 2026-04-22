@@ -12,9 +12,16 @@ In accordance with the project constraints, **no LLMs are used at runtime**. The
 
 ```text
 /
-├── reflection-tree.json         # The core knowledge graph and logic routing
-├── agent.py                     # The Python CLI runner
-├── write-up.md                  # Design rationale and psychological grounding
+├── tree/
+│   ├── reflection-tree.json     # Part A: The core knowledge graph and logic routing
+│   └── tree-diagram.md          # Part A: Visual map of the logic flow (Mermaid)
+├── agent/
+│   ├── index.html               # Part B (Bonus): The interactive Web UI 
+│   └── agent.py                 # Part B: The CLI runner implementation
+├── transcripts/
+│   ├── persona-1-transcript.md  # Part B: Simulated playthrough 1
+│   └── persona-2-transcript.md  # Part B: Simulated playthrough 2
+├── write-up.md                  # Part A: Design rationale and psychological grounding
 └── README.md                    # You are here
 ```
 
