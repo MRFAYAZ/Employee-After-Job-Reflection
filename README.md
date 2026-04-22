@@ -1,5 +1,4 @@
 # The Daily Reflection Tree
-![Flow Chart](tree/tree-diagram.png)
 
 **DeepThought Fellowship Assignment**
 
@@ -7,9 +6,9 @@ A deterministic, tree-based reflection tool designed to help employees process t
 
 In accordance with the project constraints, **no LLMs are used at runtime**. The intelligence is encoded entirely into the JSON data structure and routed deterministically via Python.
 
-# The Flow of Reflection Tree
-
 ---
+# The Flow of Reflection Tree
+![Flow Chart](tree/tree-diagram.png)
 
 ## 📂 Repository Structure
 
