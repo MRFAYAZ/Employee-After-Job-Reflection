@@ -16,7 +16,7 @@ In accordance with the project constraints, **no LLMs are used at runtime**. The
 /
 ├── tree/
 │   ├── reflection-tree.json     # Part A: The core knowledge graph and logic routing
-│   └── tree-diagram.md          # Part A: Visual map of the logic flow (Mermaid)
+│   └── tree-diagram.png          # Part A: Visual map of the logic flow (draw.io)
 ├── agent/
 │   ├── index.html               # Part B (Bonus): The interactive Web UI 
 │   └── agent.py                 # Part B: The CLI runner implementation
